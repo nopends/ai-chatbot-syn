@@ -41,7 +41,7 @@ This is a Next.js 15 AI chatbot application built with the AI SDK that supports 
 - `lib/` - Utility functions and core logic
   - `ai/` - AI model configurations, prompts, and tools
   - `db/` - Database schema, queries, and migrations
-  - `artifacts/` - Artifact management (documents, code, images, sheets)
+  - `artifacts/` - Artifact management (documents, code, images, sheets, quizzes)
 - `artifacts/` - Client and server components for different artifact types
 - `hooks/` - Custom React hooks
 - `tests/` - Playwright e2e tests and test utilities
@@ -51,7 +51,7 @@ The application uses a PostgreSQL database with the following main entities:
 - `User` - User accounts with email/password authentication
 - `Chat` - Chat sessions with visibility settings (public/private)
 - `Message_v2` - Chat messages with parts and attachments (replaces deprecated Message)
-- `Document` - Collaborative documents (text, code, image, sheet types)
+- `Document` - Collaborative documents (text, code, image, sheet, quiz types)
 - `Suggestion` - Document edit suggestions
 - `Vote_v2` - Message voting system
 - `Stream` - Chat streaming sessions
@@ -68,11 +68,12 @@ The application uses a PostgreSQL database with the following main entities:
 - Session management integrated throughout the application
 
 ### Artifacts System
-The application supports collaborative document editing with four artifact types:
+The application supports collaborative document editing with five artifact types:
 - Text documents with rich editing capabilities
 - Code editors with syntax highlighting
 - Image editing and manipulation
 - Spreadsheet/sheet functionality
+- Interactive quiz generation with multiple choice questions
 
 Each artifact type has dedicated client and server components in the `artifacts/` directory.
 

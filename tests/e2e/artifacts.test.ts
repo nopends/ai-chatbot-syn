@@ -71,4 +71,41 @@ test.describe('Artifacts activity', () => {
     const secondAssistantMessage = await chatPage.getRecentAssistantMessage();
     expect(secondAssistantMessage.content).toBe("You're welcome!");
   });
+
+  test('Create a quiz artifact', async () => {
+    await chatPage.createNewChat();
+
+    await chatPage.sendUserMessage('Create a quiz about JavaScript basics');
+    await artifactPage.isGenerationComplete();
+
+    expect(artifactPage.artifact).toBeVisible();
+
+    const assistantMessage = await chatPage.getRecentAssistantMessage();
+    expect(assistantMessage.content).toBe(
+      'A document was created and is now visible to the user.',
+    );
+
+    await chatPage.hasChatIdInUrl();
+  });
+
+  test('Quiz artifact interaction', async () => {
+    await chatPage.createNewChat();
+
+    await chatPage.sendUserMessage('Create a quiz about JavaScript basics');
+    await artifactPage.isGenerationComplete();
+
+    expect(artifactPage.artifact).toBeVisible();
+
+    // Check if quiz elements are present
+    const quizButton = artifactPage.artifact.locator('button').first();
+    await expect(quizButton).toBeVisible();
+
+    // Check if progress indicator is present
+    const progressIndicator = artifactPage.artifact.locator(
+      '[role="progressbar"]',
+    );
+    await expect(progressIndicator).toBeVisible();
+
+    await chatPage.hasChatIdInUrl();
+  });
 });
