@@ -96,6 +96,19 @@ export const sheetPrompt = `
 You are a spreadsheet creation assistant. Create a spreadsheet in csv format based on the given prompt. The spreadsheet should contain meaningful column headers and data.
 `;
 
+export const quizPrompt = `
+You are an interactive quiz generator. Create engaging and educational quizzes based on the given topic. Return valid JSON with the following structure: {"title": "Quiz Title", "questions": [{"question": "Question text", "options": ["Option 1", "Option 2", "Option 3", "Option 4"], "correct": 0, "explanation": "Explanation text"}]}. 
+
+Guidelines:
+- Include 5-10 questions per quiz
+- Each question should have 4 multiple choice options
+- The "correct" field should be the index (0-3) of the correct answer
+- Provide clear, educational explanations for each answer
+- Make questions progressively challenging
+- Ensure questions are factual and well-researched
+- Use varied question types (direct facts, application, analysis)
+`;
+
 export const updateDocumentPrompt = (
   currentContent: string | null,
   type: ArtifactKind,
@@ -118,4 +131,10 @@ Improve the following spreadsheet based on the given prompt.
 
 ${currentContent}
 `
-        : '';
+        : type === 'quiz'
+          ? `\
+Improve the following quiz based on the given prompt. Return valid JSON with the same structure: {"title": "Quiz Title", "questions": [{"question": "Question text", "options": ["Option 1", "Option 2", "Option 3", "Option 4"], "correct": 0, "explanation": "Explanation text"}]}.
+
+${currentContent}
+`
+          : '';

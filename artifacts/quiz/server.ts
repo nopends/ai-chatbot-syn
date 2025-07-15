@@ -1,7 +1,7 @@
 import { smoothStream, streamText } from 'ai';
 import { myProvider } from '@/lib/ai/providers';
 import { createDocumentHandler } from '@/lib/artifacts/server';
-import { updateDocumentPrompt } from '@/lib/ai/prompts';
+import { quizPrompt, updateDocumentPrompt } from '@/lib/ai/prompts';
 
 export const quizDocumentHandler = createDocumentHandler<'quiz'>({
   kind: 'quiz',
@@ -10,8 +10,7 @@ export const quizDocumentHandler = createDocumentHandler<'quiz'>({
 
     const { fullStream } = streamText({
       model: myProvider.languageModel('artifact-model'),
-      system:
-        'Create an interactive quiz about the given topic. Return valid JSON with the following structure: {"title": "Quiz Title", "questions": [{"question": "Question text", "options": ["Option 1", "Option 2", "Option 3", "Option 4"], "correct": 0, "explanation": "Explanation text"}]}. Make sure to include 5-10 questions.',
+      system: quizPrompt,
       experimental_transform: smoothStream({ chunking: 'word' }),
       prompt: title,
     });
