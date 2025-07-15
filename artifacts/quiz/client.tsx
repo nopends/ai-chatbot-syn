@@ -7,7 +7,6 @@ import {
   MessageIcon,
   RedoIcon,
   UndoIcon,
-  RefreshIcon,
 } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -248,8 +247,8 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
               </div>
 
               <Button onClick={resetQuiz} className="w-full">
-                <RefreshIcon className="mr-2 h-4 w-4" />
-                Retake Quiz
+                <UndoIcon size={16} />
+                <span className="ml-2">Retake Quiz</span>
               </Button>
             </CardContent>
           </Card>
@@ -393,7 +392,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
       },
     },
     {
-      icon: <RefreshIcon size={18} />,
+      icon: <UndoIcon size={18} />,
       description: 'Reset quiz',
       onClick: ({ setMetadata }) => {
         setMetadata((prev) => ({
@@ -422,7 +421,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
       },
     },
     {
-      icon: <RefreshIcon />,
+      icon: <UndoIcon size={16} />,
       description: 'Regenerate quiz',
       onClick: ({ appendMessage }) => {
         appendMessage({
