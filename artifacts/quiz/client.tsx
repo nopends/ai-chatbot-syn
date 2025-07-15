@@ -5,6 +5,7 @@ import {
   ClockRewind,
   CopyIcon,
   MessageIcon,
+  PenIcon,
   RedoIcon,
   UndoIcon,
 } from '@/components/icons';
@@ -12,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
 
@@ -34,6 +37,7 @@ interface QuizState {
 
 interface QuizArtifactMetadata {
   quizState: QuizState;
+  isEditing: boolean;
 }
 
 export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
@@ -47,6 +51,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
         showResults: false,
         score: 0,
       },
+      isEditing: false,
     });
   },
   onStreamPart: ({ streamPart, setArtifact }) => {
@@ -76,6 +81,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
     isLoading,
     metadata,
     setMetadata,
+    onSaveContent,
   }) => {
     const [quizData, setQuizData] = useState<QuizData | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -107,6 +113,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
         }, 0);
 
         setMetadata({
+          ...metadata,
           quizState: {
             ...metadata.quizState,
             answers: newAnswers,
@@ -116,6 +123,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
         });
       } else {
         setMetadata({
+          ...metadata,
           quizState: {
             ...metadata.quizState,
             answers: newAnswers,
@@ -127,6 +135,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
 
     const resetQuiz = () => {
       setMetadata({
+        ...metadata,
         quizState: {
           currentQuestion: 0,
           answers: [],
@@ -139,6 +148,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
     const goToQuestion = (questionIndex: number) => {
       if (!metadata) return;
       setMetadata({
+        ...metadata,
         quizState: {
           ...metadata.quizState,
           currentQuestion: questionIndex,
@@ -174,6 +184,178 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
           <div className="text-muted-foreground">Loading quiz...</div>
         </div>
       );
+    }
+
+    // Quiz Editor Component
+    const QuizEditor = () => {
+      const [editData, setEditData] = useState<QuizData>(quizData);
+
+      const handleSave = () => {
+        if (onSaveContent) {
+          onSaveContent(JSON.stringify(editData, null, 2), false);
+        }
+        setMetadata({
+          ...metadata,
+          isEditing: false,
+        });
+        toast.success('Quiz saved successfully!');
+      };
+
+      const handleCancel = () => {
+        setEditData(quizData);
+        setMetadata({
+          ...metadata,
+          isEditing: false,
+        });
+      };
+
+      const addQuestion = () => {
+        setEditData({
+          ...editData,
+          questions: [
+            ...editData.questions,
+            {
+              question: '',
+              options: ['', '', '', ''],
+              correct: 0,
+              explanation: '',
+            },
+          ],
+        });
+      };
+
+      const removeQuestion = (index: number) => {
+        setEditData({
+          ...editData,
+          questions: editData.questions.filter((_, i) => i !== index),
+        });
+      };
+
+      const updateQuestion = (index: number, field: string, value: any) => {
+        const updatedQuestions = [...editData.questions];
+        updatedQuestions[index] = {
+          ...updatedQuestions[index],
+          [field]: value,
+        };
+        setEditData({
+          ...editData,
+          questions: updatedQuestions,
+        });
+      };
+
+      const updateOption = (questionIndex: number, optionIndex: number, value: string) => {
+        const updatedQuestions = [...editData.questions];
+        updatedQuestions[questionIndex].options[optionIndex] = value;
+        setEditData({
+          ...editData,
+          questions: updatedQuestions,
+        });
+      };
+
+      return (
+        <div className="max-w-4xl mx-auto p-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Edit Quiz</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <label htmlFor="quiz-title" className="block text-sm font-medium mb-2">Quiz Title</label>
+                <Input
+                  id="quiz-title"
+                  value={editData.title}
+                  onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                  placeholder="Enter quiz title"
+                />
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Questions</h3>
+                  <Button onClick={addQuestion} size="sm">
+                    Add Question
+                  </Button>
+                </div>
+
+                {editData.questions.map((question, questionIndex) => (
+                  <Card key={`question-${questionIndex}-${question.question.substring(0, 10)}`} className="border-2">
+                    <CardContent className="p-4 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Question {questionIndex + 1}</h4>
+                        <Button
+                          onClick={() => removeQuestion(questionIndex)}
+                          variant="destructive"
+                          size="sm"
+                        >
+                          Remove
+                        </Button>
+                      </div>
+
+                      <div>
+                        <label htmlFor={`question-${questionIndex}`} className="block text-sm font-medium mb-2">Question</label>
+                        <Textarea
+                          id={`question-${questionIndex}`}
+                          value={question.question}
+                          onChange={(e) => updateQuestion(questionIndex, 'question', e.target.value)}
+                          placeholder="Enter question"
+                          rows={2}
+                        />
+                      </div>
+
+                      <div>
+                        <div className="block text-sm font-medium mb-2">Options</div>
+                        <div className="space-y-2">
+                          {question.options.map((option, optionIndex) => (
+                            <div key={`option-${questionIndex}-${optionIndex}-${option.substring(0, 5)}`} className="flex items-center space-x-2">
+                              <input
+                                type="radio"
+                                name={`correct-${questionIndex}`}
+                                checked={question.correct === optionIndex}
+                                onChange={() => updateQuestion(questionIndex, 'correct', optionIndex)}
+                                className="w-4 h-4"
+                              />
+                              <Input
+                                value={option}
+                                onChange={(e) => updateOption(questionIndex, optionIndex, e.target.value)}
+                                placeholder={`Option ${optionIndex + 1}`}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label htmlFor={`explanation-${questionIndex}`} className="block text-sm font-medium mb-2">Explanation</label>
+                        <Textarea
+                          id={`explanation-${questionIndex}`}
+                          value={question.explanation}
+                          onChange={(e) => updateQuestion(questionIndex, 'explanation', e.target.value)}
+                          placeholder="Enter explanation for the correct answer"
+                          rows={2}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button onClick={handleCancel} variant="outline">
+                  Cancel
+                </Button>
+                <Button onClick={handleSave}>
+                  Save Changes
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    };
+
+    // Show editor if in edit mode
+    if (metadata.isEditing) {
+      return <QuizEditor />;
     }
 
     if (metadata.quizState.showResults) {
@@ -389,6 +571,19 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
       onClick: ({ content }) => {
         navigator.clipboard.writeText(content);
         toast.success('Quiz JSON copied to clipboard!');
+      },
+    },
+    {
+      icon: <PenIcon size={18} />,
+      description: 'Edit quiz',
+      onClick: ({ setMetadata }) => {
+        setMetadata((prev) => ({
+          ...prev,
+          isEditing: true,
+        }));
+      },
+      isDisabled: ({ isCurrentVersion }) => {
+        return !isCurrentVersion;
       },
     },
     {
