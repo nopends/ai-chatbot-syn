@@ -210,7 +210,10 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
                   const isCorrect = userAnswer === question.correct;
 
                   return (
-                    <div key={index} className="border rounded-lg p-4">
+                    <div
+                      key={`question-${index}-${question.question.substring(0, 20)}`}
+                      className="border rounded-lg p-4"
+                    >
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-medium">Question {index + 1}</h3>
                         <Badge variant={isCorrect ? 'default' : 'destructive'}>
@@ -223,7 +226,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
                       <div className="space-y-1">
                         {question.options.map((option, optionIndex) => (
                           <div
-                            key={optionIndex}
+                            key={`option-${index}-${optionIndex}-${option.substring(0, 10)}`}
                             className={`text-sm p-2 rounded ${
                               optionIndex === question.correct
                                 ? 'bg-green-100 text-green-800'
@@ -285,7 +288,7 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
             <div className="space-y-2">
               {currentQuestion.options.map((option, index) => (
                 <Button
-                  key={index}
+                  key={`current-option-${index}-${option.substring(0, 10)}`}
                   variant="outline"
                   className="w-full justify-start text-left h-auto p-4"
                   onClick={() => handleAnswer(index)}
@@ -312,9 +315,9 @@ export const quizArtifact = new Artifact<'quiz', QuizArtifactMetadata>({
           </Button>
 
           <div className="flex space-x-2">
-            {quizData.questions.map((_, index) => (
+            {quizData.questions.map((question, index) => (
               <Button
-                key={index}
+                key={`nav-${index}-${question.question.substring(0, 10)}`}
                 variant={
                   index === metadata.quizState.currentQuestion
                     ? 'default'
