@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 
 export class ArtifactPage {
   constructor(private page: Page) {}
@@ -104,5 +104,20 @@ export class ArtifactPage {
 
   async closeArtifact() {
     return this.page.getByTestId('artifact-close-button').click();
+  }
+
+  async getToolbarButtons() {
+    return this.artifact.getByTestId('toolbar-button').all();
+  }
+
+  async getToolbarButtonByDescription(description: string) {
+    const buttons = await this.getToolbarButtons();
+    for (const button of buttons) {
+      const title = await button.getAttribute('title');
+      if (title === description) {
+        return button;
+      }
+    }
+    return null;
   }
 }

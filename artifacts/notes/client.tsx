@@ -9,18 +9,20 @@ import {
   PenIcon,
   RedoIcon,
   UndoIcon,
+  CheckCircleFillIcon,
 } from '@/components/icons';
 import type { Suggestion } from '@/lib/db/schema';
 import { toast } from 'sonner';
 import { getSuggestions } from '../actions';
 
-interface TextArtifactMetadata {
+interface NotesArtifactMetadata {
   suggestions: Array<Suggestion>;
 }
 
-export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
-  kind: 'text',
-  description: 'Useful for text content, like drafting essays and emails.',
+export const notesArtifact = new Artifact<'notes', NotesArtifactMetadata>({
+  kind: 'notes',
+  description:
+    'Useful for creating structured notes, outlines, and study materials.',
   initialize: async ({ documentId, setMetadata }) => {
     const suggestions = await getSuggestions({ documentId });
 
@@ -40,7 +42,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
       });
     }
 
-    if (streamPart.type === 'text-delta') {
+    if (streamPart.type === 'notes-delta') {
       setArtifact((draftArtifact) => {
         return {
           ...draftArtifact,
@@ -68,7 +70,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
     metadata,
   }) => {
     if (isLoading) {
-      return <DocumentSkeleton artifactKind="text" />;
+      return <DocumentSkeleton artifactKind="notes" />;
     }
 
     if (mode === 'diff') {
@@ -151,13 +153,35 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
   ],
   toolbar: [
     {
-      icon: <PenIcon />,
-      description: 'Add final polish',
+      icon: <MessageIcon />,
+      description: 'Add bullet points',
       onClick: ({ appendMessage }) => {
         appendMessage({
           role: 'user',
           content:
-            'Please add final polish and check for grammar, add section titles for better structure, and ensure everything reads smoothly.',
+            'Please restructure the notes using bullet points and clear headings for better organization.',
+        });
+      },
+    },
+    {
+      icon: <CheckCircleFillIcon />,
+      description: 'Add key takeaways',
+      onClick: ({ appendMessage }) => {
+        appendMessage({
+          role: 'user',
+          content:
+            'Please add a "Key Takeaways" section at the end with the most important points summarized.',
+        });
+      },
+    },
+    {
+      icon: <PenIcon />,
+      description: 'Improve structure',
+      onClick: ({ appendMessage }) => {
+        appendMessage({
+          role: 'user',
+          content:
+            'Please improve the structure and organization of these notes, adding clear sections and better formatting.',
         });
       },
     },
@@ -168,7 +192,7 @@ export const textArtifact = new Artifact<'text', TextArtifactMetadata>({
         appendMessage({
           role: 'user',
           content:
-            'Please add suggestions you have that could improve the writing.',
+            'Please add suggestions for improving the organization and content of these notes.',
         });
       },
     },

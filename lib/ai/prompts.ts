@@ -96,6 +96,10 @@ export const sheetPrompt = `
 You are a spreadsheet creation assistant. Create a spreadsheet in csv format based on the given prompt. The spreadsheet should contain meaningful column headers and data.
 `;
 
+export const notesPrompt = `
+You are a notes creation assistant. Create structured notes about the given topic. Use bullet points, headings, and organize information clearly. Include key concepts, important details, and relevant examples where appropriate. Format using markdown for better readability.
+`;
+
 export const updateDocumentPrompt = (
   currentContent: string | null,
   type: ArtifactKind,
@@ -118,4 +122,10 @@ Improve the following spreadsheet based on the given prompt.
 
 ${currentContent}
 `
-        : '';
+        : type === 'notes'
+          ? `\
+Improve the following notes based on the given prompt. Maintain the structured format with bullet points, headings, and clear organization.
+
+${currentContent}
+`
+          : '';

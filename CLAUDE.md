@@ -51,7 +51,7 @@ The application uses a PostgreSQL database with the following main entities:
 - `User` - User accounts with email/password authentication
 - `Chat` - Chat sessions with visibility settings (public/private)
 - `Message_v2` - Chat messages with parts and attachments (replaces deprecated Message)
-- `Document` - Collaborative documents (text, code, image, sheet types)
+- `Document` - Collaborative documents (text, code, image, sheet, notes types)
 - `Suggestion` - Document edit suggestions
 - `Vote_v2` - Message voting system
 - `Stream` - Chat streaming sessions
@@ -68,11 +68,12 @@ The application uses a PostgreSQL database with the following main entities:
 - Session management integrated throughout the application
 
 ### Artifacts System
-The application supports collaborative document editing with four artifact types:
+The application supports collaborative document editing with five artifact types:
 - Text documents with rich editing capabilities
 - Code editors with syntax highlighting
 - Image editing and manipulation
 - Spreadsheet/sheet functionality
+- Notes for structured information with bullet points and organization
 
 Each artifact type has dedicated client and server components in the `artifacts/` directory.
 
@@ -98,3 +99,7 @@ The application uses Playwright for comprehensive e2e testing:
 - The chat interface supports real-time streaming responses
 - File uploads are handled through Vercel Blob storage
 - The application includes comprehensive error handling and user feedback systems
+
+## Memory
+
+- Added new notes artifact to the artifacts system for collaborative document editing with structured information, bullet points, and organization features
